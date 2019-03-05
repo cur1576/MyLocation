@@ -87,16 +87,20 @@ public class MainActivity extends AppCompatActivity {
         tv.append("Verwendet: " + provider + "\n");
 
         listener = new LocationListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onLocationChanged(Location location) {
                 tv.append("Neuer Standort: ");
                 if(location!=null){
                     tv.append("Breite: " + location.getLatitude() + " Länge: " + location.getLongitude() + "\n");
                     Geocoder gc = new Geocoder(MainActivity.this);
-                    if(gc.isPresent()){
+//                    location.setLatitude(52);
+//                    location.setLongitude(13);
+                    location = manager.getLastKnownLocation(provider);
+                    if(Geocoder.isPresent()){
                         try {
                            List<Address> adr = gc.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                            Address address = adr.get(0);
+                            Address address = adr.get(0);  // kann im Emulator zu einer IndexOutOfBoundException führen!!
                             tv.append(address.getAddressLine(0));
                         } catch (IOException e) {
                             Log.e("Error", "", e);
