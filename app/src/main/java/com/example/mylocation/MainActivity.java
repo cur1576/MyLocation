@@ -3,7 +3,9 @@ package com.example.mylocation;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,10 +14,12 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             tv.append("requires Satellite: " + locationProvider.requiresSatellite() + "\n");
         }
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE); // grobe Genauigkeit
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         provider = manager.getBestProvider(criteria,true);
         tv.append("Verwendet: " + provider + "\n");
@@ -88,6 +92,16 @@ public class MainActivity extends AppCompatActivity {
                 tv.append("Neuer Standort: ");
                 if(location!=null){
                     tv.append("Breite: " + location.getLatitude() + " Länge: " + location.getLongitude() + "\n");
+                    Geocoder gc = new Geocoder(MainActivity.this);
+                    if(gc.isPresent()){
+                        try {
+                           List<Address> adr = gc.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                            Address address = adr.get(0);
+                            tv.append(address.getAddressLine(0));
+                        } catch (IOException e) {
+                            Log.e("Error", "", e);
+                        }
+                    }
                 }
             }
 
