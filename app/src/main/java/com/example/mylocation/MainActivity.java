@@ -1,7 +1,10 @@
 package com.example.mylocation;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -50,6 +53,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        manager.requestLocationUpdates(provider,10000,0,listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        manager.removeUpdates(listener);
+    }
+
     private void doIt(){
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
         List<String> providers = manager.getAllProviders();
@@ -60,6 +76,36 @@ public class MainActivity extends AppCompatActivity {
             tv.append("requires Network: " + locationProvider.requiresNetwork() + "\n");
             tv.append("requires Satellite: " + locationProvider.requiresSatellite() + "\n");
         }
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE); // grobe Genauigkeit
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        provider = manager.getBestProvider(criteria,true);
+        tv.append("Verwendet: " + provider + "\n");
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                tv.append("Neuer Standort: ");
+                if(location!=null){
+                    tv.append("Breite: " + location.getLatitude() + " Länge: " + location.getLongitude() + "\n");
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
     }
 }
