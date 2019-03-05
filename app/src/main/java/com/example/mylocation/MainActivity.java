@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        manager.requestLocationUpdates(provider,10000,0,listener);
+        manager.requestLocationUpdates(provider,10000,0.5F,listener);
     }
 
     @Override
